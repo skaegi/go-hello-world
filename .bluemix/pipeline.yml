@@ -7,13 +7,13 @@ stages:
   triggers:
   - type: commit
   jobs:
-  - name: go-compile
+  - name: go-build
     type: builder
     artifact_dir: ./
     build_type: shell
     script: |-
-      #!/bin/basheroo
-      wget https://raw.githubusercontent.com/canha/golang-tools-install-script/28fb3d63e3746acfa624d28395a0df3e0f9fca1e/goinstall.sh >/dev/null 2>&1
+      #!/bin/bash
+      wget https://raw.githubusercontent.com/canha/golang-tools-install-script/master/main.sh >/dev/null 2>&1
       bash goinstall.sh --64
       source $HOME/.profile
       make
@@ -21,15 +21,17 @@ stages:
   inputs:
   - type: job
     stage: Build
-    job: go-compile
+    job: go-build
+  triggers:
+  - type: stage
   jobs:
   - name: Deploy
     type: deployer
     target:
-      url: ${CF_TARGET_URL}
-      organization: ${CF_ORGANIZATION}
-      space: ${CF_SPACE}
-      application: ${CF_APP}
+      url: https://api.ng.bluemix.net
+      organization: simon_kaegi@ca.ibm.com
+      space: dev
+      application: go-hello-world-skaegi-1618
     script: |-
       #!/bin/bash
       cf push
